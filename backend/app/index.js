@@ -4,6 +4,7 @@ const createError = require('http-errors')
 const { verifyAccessToken } = require('./helpers/jwt_helper')
 const AuthRoute = require('./Auth/Auth.route')
 const UserRoute = require('./User/User.route')
+const LeadsRoute = require('./Leads/Leads.route')
 
 require('./helpers/init_mongodb')
 require('./helpers/init_redis')
@@ -23,7 +24,8 @@ var init = function(app, port) {
     app.use('/api/user', verifyAccessToken('supper_admin'), UserRoute);
     
     //leads routes
-
+    app.use('/api/leads', verifyAccessToken('staff'), LeadsRoute);
+    
     //handle not found error, 404
     app.use(async (req, res, next) => {
         next(createError.NotFound())
@@ -31,6 +33,8 @@ var init = function(app, port) {
     
     //handle server side error, 500
     app.use((err, req, res, next) => {
+        console.error(err);
+        
         res.status(err.status || 500)
         res.send({
             error: {

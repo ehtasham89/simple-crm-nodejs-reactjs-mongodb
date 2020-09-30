@@ -29,6 +29,7 @@ module.exports = {
 
       res.send({ accessToken, refreshToken })
     } catch (error) {
+      console.error(error);
       if (error.isJoi === true) error.status = 422
       next(error)
     }
@@ -51,6 +52,7 @@ module.exports = {
 
       res.send({ accessToken, refreshToken })
     } catch (error) {
+      console.error(error);
       if (error.isJoi === true)
         return next(createError.BadRequest('Invalid Username/Password'))
       next(error)
@@ -67,6 +69,7 @@ module.exports = {
       const refToken = await signRefreshToken(userId)
       res.send({ accessToken: accessToken, refreshToken: refToken })
     } catch (error) {
+      console.error(error);
       next(error)
     }
   },
@@ -85,6 +88,7 @@ module.exports = {
         res.sendStatus(204)
       })
     } catch (error) {
+      console.error(error);
       next(error)
     }
   },

@@ -12,6 +12,23 @@ const userSchema = Joi.object({
   role: Joi.string().valid('supper_admin', 'staff'),
 })
 
+const leadsSchema = Joi.object({
+  name: Joi.string().min(3).required(),
+  email: Joi.string().email().lowercase().required(),
+  phone: Joi.string().min(9).required(),
+  user_id: Joi.string().required()
+})
+
+const leadsUpdateSchema = Joi.object({
+  name: Joi.string().min(3),
+  email: Joi.string().email().lowercase(),
+  phone: Joi.string().min(9),
+  user_id: Joi.string()
+})
+
 module.exports = {
   authSchema,
+  userSchema,
+  leadsSchema,
+  leadsUpdateSchema
 }
