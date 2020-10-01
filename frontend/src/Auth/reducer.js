@@ -11,7 +11,6 @@ const initialState = {
     requesting: false,
     token: null,
     error: null,
-    location: "",
     user: {}
 };
 

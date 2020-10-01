@@ -13,16 +13,16 @@ export const authBootStart = () => ({
 
 export const authBootComplete = (token, user = {}) => ({
     type: AUTH_BOOT_COMPLETE,
-    payload: { token, user, bootcomplete: true, ...(!token && { location: "" }) }
+    payload: { token, user, bootcomplete: true }
 })
 
 export const requestSend = () => ({
     type: AUTH_REQUEST_SEND
 })
 
-export const requestSuccess = (token, location) => ({
+export const requestSuccess = (token) => ({
     type: AUTH_REQUEST_SUCCESS,
-    payload: { token, location }
+    payload: { token }
 })
 
 export const requestFail = (error) => ({
@@ -64,23 +64,32 @@ export const authenticate = (credencials) => (dispatch) => {
     dispatch(logout());
     dispatch(requestSend());
 
-    const location = credencials.location || "";
-
     return new Promise((resolve, reject) => {
         api.getAccessToken(credencials).then((tokenObject) => {
-            authService.saveToken(tokenObject).then(() => {
-                dispatch(requestSuccess(tokenObject.access_token, location));
-                
-                authService.saveAuthUser({username: credencials.username, location: credencials.location});
+            if (tokenObject === undefined) {
+                const errorResp = "Login Failed, email or password not correct.";
+                dispatch(requestFail(errorResp));
+                reject(errorResp);
+            } else {
+                authService.saveToken(tokenObject).then(() => {
+                    dispatch(requestSuccess(tokenObject.accessToken));
+                    
+                    authService.saveAuthUser({email: credencials.email});
 
-                resolve();
-            }).then(() => {
-                api.getLoggedUser().then(user => {
-                    dispatch(authBootComplete(tokenObject.accessToken, user));
+                    resolve();
+                }).then(() => {
+                    api.getLoggedUser().then(user => {
+                        dispatch(authBootComplete(tokenObject.accessToken, user && user.data));
+                    });
                 });
-            });
+            }
         }).catch((error) => {
-            dispatch(requestFail(error));
+            console.log("error", error);
+            const errorMsg = error && error.response && 
+                            error.response.data && 
+                            error.response.data.error ? error.response.data.error.message:"Server side error.";
+
+            dispatch(requestFail(errorMsg));
             
             reject(error);
         });

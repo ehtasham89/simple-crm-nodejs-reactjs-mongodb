@@ -17,6 +17,8 @@ const getClient = (baseUrl = null) => {
 
             if (!requestConfig.headers['Authorization']) {
                 requestConfig.headers['Authorization'] = `Bearer ${authService.getAccessToken()}`;
+            } else if (requestConfig.headers['Authorization'] === 'default') {
+                delete requestConfig.headers['Authorization'];
             }
 
             return requestConfig;

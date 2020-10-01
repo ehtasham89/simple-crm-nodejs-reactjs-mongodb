@@ -6,7 +6,7 @@ module.exports = {
   findById: async (req, res, next) => {
     try {
       const data = await User.findById(req.params.id)
-      
+
       if (!data.length)
         throw createError.NotFound(`User data not found!`)
 
@@ -32,7 +32,7 @@ module.exports = {
 
   create: async (req, res, next) => {
     try {
-      const result = await userSchema.validateAsync(req.body)
+      const result = await userSchema.validateAsync({...req.body, type: "staff"})
       const doesExist = await User.findOne({ email: result.email })
 
       if (doesExist)

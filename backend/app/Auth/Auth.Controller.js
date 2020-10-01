@@ -7,16 +7,16 @@ const {
   signAccessToken,
   signRefreshToken,
   verifyRefreshToken,
+  getPayload
 } = require('../helpers/jwt_helper')
 const client = require('../helpers/init_redis')
 
 module.exports = {
   loggedUser: async (req, res, next) => {
     try {
-      const userId = req.headers.authorization ? req.headers.authorization.split(' ')[1]:null;
+      const userId = await getPayload(req, next);
       const data = await User.findById(userId)
-      
-      if (!data.length)
+      if (!data._id)
         throw createError.NotFound(`User data not found!`)
 
       res.send({ data })
@@ -26,40 +26,15 @@ module.exports = {
     }
   },
 
-  register: async (req, res, next) => {
-    try {
-      const result = await userSchema.validateAsync(req.body)
-
-      const doesExist = await User.findOne({ email: result.email })
-      if (doesExist)
-        throw createError.Conflict(`${result.email} is already been registered`)
-
-      const user = new User(result)
-      const savedUser = await user.save()
-
-      redisClient.SET(`auth_type_${savedUser._id}`, user.role, 'EX', 60 * 60)
-    
-      const accessToken = await signAccessToken(savedUser.id)
-      const refreshToken = await signRefreshToken(savedUser.id)
-
-      res.send({ accessToken, refreshToken })
-    } catch (error) {
-      console.error(error)
-
-      if (error.isJoi === true) error.status = 422
-      next(error)
-    }
-  },
-
   login: async (req, res, next) => {
     try {
       const result = await authSchema.validateAsync(req.body)
-      const user = await User.findOne({ email: result.email })
+      const user = await User.findOne({ email: result.email }).select('+password').exec()
       if (!user) throw createError.NotFound('User not registered')
 
       const isMatch = await user.isValidPassword(result.password)
       if (!isMatch)
-        throw createError.Unauthorized('Username/password not valid')
+        throw createError.Unauthorized('email/password not valid')
 
       const accessToken = await signAccessToken(user.id)
       const refreshToken = await signRefreshToken(user.id)
@@ -69,6 +44,27 @@ module.exports = {
       res.send({ accessToken, refreshToken })
     } catch (error) {
       console.error(error)
+
+      if (error.isJoi === true)
+        return next(createError.BadRequest('Invalid email/Password'))
+      
+        next(error)
+    }
+  },
+  registerAdmin: async (req, res, next) => {
+    try {
+      const result = await userSchema.validateAsync({...req.body, type: "supper_admin"})
+      const doesExist = await User.findOne({ email: result.email })
+
+      if (doesExist)
+        throw createError.Conflict(`${result.email} is already been registered`)
+
+      const user = new User(result)
+      const savedUser = await user.save()
+
+      res.send({ data:savedUser, message: "User data saved successfully." })
+    } catch (error) {
+      console.error(error);
 
       if (error.isJoi === true)
         return next(createError.BadRequest('Invalid Username/Password'))

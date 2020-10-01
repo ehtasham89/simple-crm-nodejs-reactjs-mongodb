@@ -1,8 +1,8 @@
-import localStorage from 'node-localstorage';
 import {
     Redirect
   } from "react-router-dom";
 import { AUTH_STORAGE_KEY, AUTH_USER_KEY } from './../../common/constants';
+
 
 class AuthenticationService {
 
@@ -23,9 +23,10 @@ class AuthenticationService {
 
     saveToken(tokenObject) {
         this.tokenObject = tokenObject;
-        localStorage.setItem();
 
-        return localStorage.setItem(AUTH_STORAGE_KEY, tokenObject ? JSON.stringify(tokenObject):null);
+        localStorage.setItem(AUTH_STORAGE_KEY, tokenObject ? JSON.stringify(tokenObject):null);
+
+        return Promise.resolve(null);
     }
 
     removeToken(redirect = false) {

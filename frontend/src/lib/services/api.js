@@ -8,7 +8,8 @@ class Api extends BaseApiClient {
     getAccessToken(credencials) {
         return this.post(`/auth/login`, credencials, {
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'default'
             }
         });
     }
