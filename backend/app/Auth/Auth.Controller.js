@@ -11,6 +11,21 @@ const {
 const client = require('../helpers/init_redis')
 
 module.exports = {
+  loggedUser: async (req, res, next) => {
+    try {
+      const userId = req.headers.authorization ? req.headers.authorization.split(' ')[1]:null;
+      const data = await User.findById(userId)
+      
+      if (!data.length)
+        throw createError.NotFound(`User data not found!`)
+
+      res.send({ data })
+    } catch (error) {
+      console.error(error)
+      next(error)
+    }
+  },
+
   register: async (req, res, next) => {
     try {
       const result = await userSchema.validateAsync(req.body)
@@ -29,7 +44,8 @@ module.exports = {
 
       res.send({ accessToken, refreshToken })
     } catch (error) {
-      console.error(error);
+      console.error(error)
+
       if (error.isJoi === true) error.status = 422
       next(error)
     }
@@ -52,7 +68,8 @@ module.exports = {
 
       res.send({ accessToken, refreshToken })
     } catch (error) {
-      console.error(error);
+      console.error(error)
+
       if (error.isJoi === true)
         return next(createError.BadRequest('Invalid Username/Password'))
       next(error)

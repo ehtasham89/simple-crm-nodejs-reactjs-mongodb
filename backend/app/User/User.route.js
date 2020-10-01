@@ -6,6 +6,8 @@ router.get('/list', UserController.list)
 
 router.post('/create', UserController.create)
 
+router.get('/:id', UserController.findById)
+
 router.put('/:id', UserController.update)
 
 router.delete('/:id', UserController.delete)

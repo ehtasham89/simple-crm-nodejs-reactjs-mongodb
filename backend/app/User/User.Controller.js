@@ -3,6 +3,20 @@ const User = require('./User.model')
 const { authSchema } = require('../helpers/validation_schema')
 
 module.exports = {
+  findById: async (req, res, next) => {
+    try {
+      const data = await User.findById(req.params.id)
+      
+      if (!data.length)
+        throw createError.NotFound(`User data not found!`)
+
+      res.send({ data })
+    } catch (error) {
+      console.error(error);
+      next(error)
+    }
+  },
+  
   list: async (req, res, next) => {
     try {
       const data = await User.find({})
@@ -19,8 +33,8 @@ module.exports = {
   create: async (req, res, next) => {
     try {
       const result = await userSchema.validateAsync(req.body)
-
       const doesExist = await User.findOne({ email: result.email })
+
       if (doesExist)
         throw createError.Conflict(`${result.email} is already been registered`)
 

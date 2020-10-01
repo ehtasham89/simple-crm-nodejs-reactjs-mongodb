@@ -1,11 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-//import App from './App';
+import StoreProvider from './lib/redux/provider';
+import Routes from './common/routes';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <React.StrictMode>
-    <div>Simple CRM</div>
+    <StoreProvider>
+      <Routes />
+    </StoreProvider>
+    
   </React.StrictMode>,
   document.getElementById('root')
 );
