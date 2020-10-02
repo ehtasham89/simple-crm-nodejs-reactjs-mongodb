@@ -19,9 +19,7 @@ export default function App() {
                 <Signup type="admin" />
             </Route>
             
-            <ProtectedRoute path="/signup-staff">
-                <Signup type="staff" />
-            </ProtectedRoute>
+            <ProtectedRoute path="/signup-staff" component={props => <Signup type="staff" />} />
 
             <Route path="/">
                 <Login />

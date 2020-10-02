@@ -4,7 +4,7 @@ const AuthController = require('./Auth.Controller')
 
 router.get('/me', AuthController.loggedUser)
 
-router.post('/register', AuthController.registerAdmin)
+router.post('/register', AuthController.create)
 
 router.post('/login', AuthController.login)
 

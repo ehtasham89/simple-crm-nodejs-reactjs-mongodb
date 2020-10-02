@@ -31,7 +31,7 @@ export const logout = () => ({
     type: "USER_LOGOUT"
 });
 
-export const authenticate = (credencials) => (dispatch) => {
+export const authenticate = (credencials, setRedirect = e => e) => (dispatch) => {
     dispatch(logout());
     dispatch(requestSend());
 
@@ -53,6 +53,8 @@ export const authenticate = (credencials) => (dispatch) => {
                         user && dispatch(authUser(user.data));
                     });
                 });
+
+                setRedirect(true);
             }
         }).catch((error) => {
             dispatch(requestFail(errorResp(error)));

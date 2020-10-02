@@ -1,6 +1,7 @@
 const createError = require('http-errors')
 const User = require('./User.model')
-const { authSchema } = require('../helpers/validation_schema')
+const { userSchema } = require('../helpers/validation_schema')
+const { getPayload } = require('../helpers/jwt_helper')
 
 module.exports = {
   findById: async (req, res, next) => {
@@ -26,27 +27,6 @@ module.exports = {
       res.send({ data })
     } catch (error) {
       console.error(error);
-      next(error)
-    }
-  },
-
-  create: async (req, res, next) => {
-    try {
-      const result = await userSchema.validateAsync({...req.body, role: "staff"})
-      const doesExist = await User.findOne({ email: result.email })
-
-      if (doesExist)
-        throw createError.Conflict(`${result.email} is already been registered`)
-
-      const user = new User(result)
-      const savedUser = await user.save()
-
-      res.send({ data:savedUser, message: "User data saved successfully." })
-    } catch (error) {
-      console.error(error);
-
-      if (error.isJoi === true)
-        return next(createError.BadRequest('Invalid user data'))
       next(error)
     }
   },

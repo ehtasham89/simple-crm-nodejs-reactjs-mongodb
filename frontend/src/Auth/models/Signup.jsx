@@ -1,30 +1,48 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import styled from 'styled-components';
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Formik, Form as FormikForm } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 import { createUser, requestFail } from "./../actions";
+
+// component constructor
+const useConstructor = (callBack = () => {}) => {
+  const [hasBeenCalled, setHasBeenCalled] = useState(false);
+  
+  if (hasBeenCalled) return;
+  
+  callBack();
+  setHasBeenCalled(true);
+}
 
 export default ({ type }) => {
     const title = `Sign Up ${type === 'admin' ? 'Supper Admin User':'Staff User'}`;
     const dispatch = useDispatch();
-    const respError = useSelector(state => state.auth.error);
+    const [redirect, setRedirect] = useState(false);
+    const authState = useSelector(state => state.auth);
+
+    //custom constructor for component
+    useConstructor(() => {
+      if(authState.token !== "") {
+          setRedirect(true);
+      }
+
+      dispatch(requestFail(null));
+    });
 
     useEffect(() => {
         // Update the document title using the browser API
         document.title = `Page: ${title}`;
-
-        dispatch(requestFail(null)); //set error to null on load
     });
 
-    return (
+    return ( redirect && type === "admin" ? <Redirect to="/signup-staff" /> :
         <CONTAINER>
             <h4>Simple CRM - {title}</h4>
-            <Error>{respError}</Error>
+            <Error>{authState.error}</Error>
             <Formik 
                 initialValues={{ name: "", email:"", password:"", confirmPassword: "" }}
                 // Hooks up our validationSchema to Formik 

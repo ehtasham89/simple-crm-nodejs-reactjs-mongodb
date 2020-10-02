@@ -3,7 +3,6 @@ import {
   } from "react-router-dom";
 import { AUTH_STORAGE_KEY, AUTH_USER_KEY } from './../../common/constants';
 
-
 class AuthenticationService {
 
     tokenObject = null;

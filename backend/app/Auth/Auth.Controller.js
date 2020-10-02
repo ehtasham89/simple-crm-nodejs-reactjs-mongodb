@@ -51,9 +51,13 @@ module.exports = {
         next(error)
     }
   },
-  registerAdmin: async (req, res, next) => {
+
+  create: async (req, res, next) => {
     try {
-      const result = await userSchema.validateAsync({...req.body, role: "supper_admin"})
+      const userId = await getPayload(req, next)
+      const role = userId ? "staff":"supper_admin"
+      
+      const result = await userSchema.validateAsync({...req.body, role})
       const doesExist = await User.findOne({ email: result.email })
 
       if (doesExist)
