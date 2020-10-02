@@ -51,32 +51,33 @@ export const authenticate = (credencials, setRedirect = e => e) => (dispatch) =>
                 }).then(() => {
                     api.getLoggedUser().then(user => {
                         user && dispatch(authUser(user.data));
+                        setRedirect(true);
                     });
                 });
-
-                setRedirect(true);
             }
         }).catch((error) => {
             dispatch(requestFail(errorResp(error)));
-            reject(errorResp);
+            reject(errorResp(error));
         });
     });
 }
 
-export const createUser = ({confirmPassword, ...rest}) => (dispatch) => {
+export const createUser = ({confirmPassword, ...rest}, type, setRedirect = (e) => e) => (dispatch) => {
     return new Promise((resolve, reject) => {
-        api.registerNewUser(rest).then((user) => {
+        api.registerNewUser(rest, type).then((user) => {
             if (user === undefined) {
                 const errorResp = "Sign-Up user faild, Server side error";
                 dispatch(requestFail(errorResp));
                 reject(errorResp);
             } else {
+                setRedirect(true);
+                
                 dispatch(requestFail("New user register successfully, please login."));
                 resolve(null);
             }
         }).catch((error) => {
             dispatch(requestFail(errorResp(error)));
-            reject(errorResp);
+            reject(errorResp(error));
         });
     });
 }

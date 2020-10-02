@@ -104,7 +104,8 @@ module.exports = {
     })
   },
   getPayload: (req, next) => {
-    if (!req.headers['authorization']) return next(createError.Unauthorized())
+    if (!req.headers['authorization']) return "";
+    
     const authHeader = req.headers['authorization']
     const bearerToken = authHeader.split(' ')
     const token = bearerToken[1]

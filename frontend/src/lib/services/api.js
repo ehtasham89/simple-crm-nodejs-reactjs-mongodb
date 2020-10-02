@@ -14,8 +14,8 @@ class Api extends BaseApiClient {
         });
     }
 
-    registerNewUser(data) {
-        return this.post(`/auth/register`, data, {
+    registerNewUser(data, type) {
+        return this.post(`/auth/register`, {...data, type}, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'default'
@@ -32,12 +32,9 @@ class Api extends BaseApiClient {
         return this.get(`/user/${id}`);
     }
 
-    getUserList() {
-        return this.get(`/user/list`);
-    }
-
-    newUser(data) {
-        return this.post(`/user/create`, data);
+    getUserList(userId) {
+        console.log("userIduserIduserId", userId);
+        return this.post(`/user/list`, {userId});
     }
 
     updateUser(id, data) {

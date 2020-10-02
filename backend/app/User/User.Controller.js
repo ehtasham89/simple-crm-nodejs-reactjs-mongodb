@@ -20,7 +20,9 @@ module.exports = {
   
   list: async (req, res, next) => {
     try {
-      const data = await User.find({role: "staff"})
+      const { userId } = req.body;
+      const data = await User.find({userId})
+
       if (!data.length)
         throw createError.NotFound(`User list is empty.`)
 
@@ -33,18 +35,19 @@ module.exports = {
 
   update: async (req, res, next) => {
     try {
-      const { name } = req.body
+      const id = req.params.id
+      const userParam = req.body
       
-      if (!name) throw createError.BadRequest("name are required")
+      if (!userParam.name) throw createError.BadRequest("name is required")
 
-      const user = await User.findById(id)
-      if (!user) throw createError.NotFound('User not found!')
-
-      user.name = name;
-      const updateUser = new User(user);
-      const savedUser = await updateUser.updateOne();
-
-      res.send({ data: savedUser, message: "user updated successfully"})
+      await User.findByIdAndUpdate(id, userParam, (err, data) => {
+        if(err){
+            res.send(err)
+        }
+        else{
+            res.send({data, message: "user updated successfully"})
+        }
+      })
     } catch (error) {
       console.error(error);
       next(error)

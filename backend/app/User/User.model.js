@@ -20,6 +20,9 @@ const UserSchema = new Schema({
   },
   role: {
     type: String, //default value is 'staff'
+  },
+  userId: {
+    type: String, //default value is 'staff'
   }
 })
 

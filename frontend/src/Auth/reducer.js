@@ -8,6 +8,7 @@ import {
 const initialState = {
     requesting: false,
     error: null,
+    token: "",
     user: {}
 };
 
@@ -16,7 +17,7 @@ export default (previousState = initialState, action) => {
         case AUTH_USER: return { ...previousState, ...action.payload};
         case AUTH_REQUEST_SEND: return { ...previousState, requesting: true };
         case AUTH_REQUEST_SUCCESS: return { ...previousState, requesting: false, ...action.payload };
-        case AUTH_REQUEST_FAIL: return { ...previousState, requesting: false, bootcomplete: true, error: action.payload };
+        case AUTH_REQUEST_FAIL: return { ...previousState, requesting: false, error: action.payload };
         default: return previousState;
     }
 };

@@ -8,55 +8,60 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, Redirect } from 'react-router-dom';
 
 import { createUser, requestFail } from "./../actions";
+import { updateUser } from "./../../User/actions";
 
 // component constructor
-const useConstructor = (callBack = () => {}) => {
+/* const useConstructor = (callBack = () => {}) => {
   const [hasBeenCalled, setHasBeenCalled] = useState(false);
   
   if (hasBeenCalled) return;
   
   callBack();
   setHasBeenCalled(true);
-}
+} */
 
 export default ({ type }) => {
     const title = `Sign Up ${type === 'admin' ? 'Supper Admin User':'Staff User'}`;
     const dispatch = useDispatch();
     const [redirect, setRedirect] = useState(false);
     const authState = useSelector(state => state.auth);
+    const user = useSelector(state => state.user);
 
-    //custom constructor for component
-    useConstructor(() => {
+    useEffect(() => {
+      // Update the document title using the browser API
+      document.title = `Page: ${title}`;
+
       if(authState.token !== "") {
-          setRedirect(true);
+        type === "admin" && setRedirect(true);
       }
 
       dispatch(requestFail(null));
-    });
+    },[]);
 
-    useEffect(() => {
-        // Update the document title using the browser API
-        document.title = `Page: ${title}`;
-    });
-
-    return ( redirect && type === "admin" ? <Redirect to="/signup-staff" /> :
+    return ( redirect ? <Redirect to="/user-list" /> :
         <CONTAINER>
             <h4>Simple CRM - {title}</h4>
             <Error>{authState.error}</Error>
             <Formik 
-                initialValues={{ name: "", email:"", password:"", confirmPassword: "" }}
+                initialValues={(!user.current._id ? {name: "", email:"", password:"", confirmPassword: "" }:{name: user.current.name})}
                 // Hooks up our validationSchema to Formik 
                 onSubmit={(values, {setSubmitting, resetForm}) => {
                     // When button submits form and form is in the process of submitting, submit button is disabled
                     setSubmitting(true);
                     
-                    dispatch(createUser(values))
+                    user.current._id ? 
+                    dispatch(updateUser(user.current._id, {name: values.name}), setRedirect) :
+                    dispatch(createUser({
+                      ...values, 
+                      ...(authState.user._id ? {userId: authState.user._id}:{})}, 
+                      type, setRedirect
+                    ));
 
-                    resetForm()
+                    resetForm();
                     // Sets setSubmitting to false after form is reset
                     setSubmitting(false);
                 }}
-                validationSchema={validationSchema}
+                validationSchema={validationSchema(authState.user._id)}
                 >
                     {/* Callback function containing Formik state and helpers that handle common form actions */}
                 {( {values,
@@ -83,62 +88,66 @@ export default ({ type }) => {
                                 <Error>{errors.name}</Error>
                             ): null}
                     </Form.Group>
+                    
+                    {!user.current._id && <>
+                      <Form.Group controlId="formBasicEmail">
+                          <Form.Label>Email address</Form.Label>
+                          <Form.Control 
+                              type="email" 
+                              placeholder="Enter email" 
+                              name="email"
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              value={values.email}
+                              className={touched.email && errors.email ? "error" : null}
+                          />
+                          {touched.email && errors.email ? (
+                                  <Error>{errors.email}</Error>
+                              ): null}
+                      </Form.Group>
 
-                    <Form.Group controlId="formBasicEmail">
-                        <Form.Label>Email address</Form.Label>
-                        <Form.Control 
-                            type="email" 
-                            placeholder="Enter email" 
-                            name="email"
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            value={values.email}
-                            className={touched.email && errors.email ? "error" : null}
-                        />
-                        {touched.email && errors.email ? (
-                                <Error>{errors.email}</Error>
-                            ): null}
-                    </Form.Group>
-
-                    <Form.Group controlId="formBasicPassword">
-                        <Form.Label>Password</Form.Label>
-                        <Form.Control 
-                            type="password" 
-                            placeholder="Password" 
-                            name="password"
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            value={values.password}
-                            className={touched.password && errors.password ? "error" : null}
-                        />
-                        {touched.password && errors.password ? (
-                                <Error>{errors.password}</Error>
-                            ): null}
-                    </Form.Group>
-
-                    <Form.Group controlId="formBasicConfirmPassword">
-                        <Form.Label>Confirm Password</Form.Label>
-                        <Form.Control 
-                            type="password" 
-                            placeholder="Confirm Password" 
-                            name="confirmPassword"
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            value={values.confirmPassword}
-                            className={touched.confirmPassword && errors.confirmPassword ? "error" : null}
-                        />
-                        {touched.confirmPassword && errors.confirmPassword ? (
-                                <Error>{errors.confirmPassword}</Error>
-                            ): null}
-                    </Form.Group>
+                      <Form.Group controlId="formBasicPassword">
+                          <Form.Label>Password</Form.Label>
+                          <Form.Control 
+                              type="password" 
+                              placeholder="Password" 
+                              name="password"
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              value={values.password}
+                              className={touched.password && errors.password ? "error" : null}
+                          />
+                          {touched.password && errors.password ? (
+                                  <Error>{errors.password}</Error>
+                              ): null}
+                      </Form.Group>
+                    
+                      <Form.Group controlId="formBasicConfirmPassword">
+                          <Form.Label>Confirm Password</Form.Label>
+                          <Form.Control 
+                              type="password" 
+                              placeholder="Confirm Password" 
+                              name="confirmPassword"
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              value={values.confirmPassword}
+                              className={touched.confirmPassword && errors.confirmPassword ? "error" : null}
+                          />
+                          {touched.confirmPassword && errors.confirmPassword ? (
+                                  <Error>{errors.confirmPassword}</Error>
+                              ): null}
+                      </Form.Group>
+                    </>}
 
                     <BUTTON variant="primary" type="submit" disabled={isSubmitting}>
-                        Sing Up
+                        {type === "admin" ? "Sing Up" : user.current._id ? "Update User" : "Add User"}
                     </BUTTON>
-
-                    <ButtonLink variant="primary" to="/">
-                        Login
-                    </ButtonLink>
+                    
+                    {type === "admin" &&
+                      <ButtonLink variant="primary" to="/">
+                          Login
+                      </ButtonLink>
+                    }
                 </MYFORM>
             )}
             </Formik>
@@ -147,7 +156,14 @@ export default ({ type }) => {
 }
 
 // Schema for yup
-const validationSchema = Yup.object().shape({
+const validationSchema = (id) => Yup.object().shape(
+  id ? {
+    name: Yup.string()
+      .min(3, "*Name must have at least 3 characters")
+      .max(100, "*Name must be less than 100 characters")
+      .required("*Name is required")
+  }:
+  {
     name: Yup.string()
       .min(3, "*Name must have at least 3 characters")
       .max(100, "*Name must be less than 100 characters")
@@ -170,10 +186,10 @@ const CONTAINER = styled.div`
   background: #F7F9FA;
   height: auto;
   width: 40%;
-  margin: 5em auto;
-  padding: 25px;
+  margin: 1em auto;
+  padding: 10px 25px 25px;
   color: snow;
-  border: 2px solid #e5e5e5;
+  border: 1px solid #e9e9e9;
 
   @media(min-width: 786px) {
     width: 35%;

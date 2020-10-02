@@ -54,10 +54,9 @@ module.exports = {
 
   create: async (req, res, next) => {
     try {
-      const userId = await getPayload(req, next)
-      const role = userId ? "staff":"supper_admin"
+      const { type, ...rest } = req.body
       
-      const result = await userSchema.validateAsync({...req.body, role})
+      const result = await userSchema.validateAsync({...rest, role: type === 'admin' ? "supper_admin":"staff"})
       const doesExist = await User.findOne({ email: result.email })
 
       if (doesExist)

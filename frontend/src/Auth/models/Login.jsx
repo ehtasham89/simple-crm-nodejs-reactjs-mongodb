@@ -9,37 +9,24 @@ import { Link, Redirect } from 'react-router-dom';
 
 import { authenticate, requestFail } from "./../actions";
 
-// component constructor
-const useConstructor = (callBack = () => {}) => {
-    const [hasBeenCalled, setHasBeenCalled] = useState(false);
-    
-    if (hasBeenCalled) return;
-    
-    callBack();
-    setHasBeenCalled(true);
-}
-
 export default () => {
     const title = "Sign In";
     const dispatch = useDispatch();
     const [redirect, setRedirect] = useState(false);
     const authState = useSelector(state => state.auth);
-    
-    //custom constructor for component
-    useConstructor(() => {
-        if(authState.token !== "") {
-            setRedirect(true);
-        }
-
-        dispatch(requestFail(null));
-    });
 
     useEffect(() => {
         // Update the document title using the browser API
         document.title = `Page: ${title}`;
-    }, []);
 
-    return ( redirect ? <Redirect to="/signup-staff" /> :
+        if(authState.token !== "") {
+            //setRedirect(true);
+        }
+
+        dispatch(requestFail(null));
+    },[]);
+
+    return ( redirect === true ? <Redirect to="/user-list" /> :
         <CONTAINER>
             <h1>Simple CRM - {title}</h1>
             <Error>{authState.error}</Error>
