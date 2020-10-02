@@ -35,7 +35,7 @@ class AuthenticationService {
         localStorage.removeItem(AUTH_STORAGE_KEY);
 
         if (redirect)
-            Redirect("/auth/login");
+            Redirect("/");
         return Promise.resolve(null);
     }
 

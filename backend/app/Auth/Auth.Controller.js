@@ -53,7 +53,7 @@ module.exports = {
   },
   registerAdmin: async (req, res, next) => {
     try {
-      const result = await userSchema.validateAsync({...req.body, type: "supper_admin"})
+      const result = await userSchema.validateAsync({...req.body, role: "supper_admin"})
       const doesExist = await User.findOne({ email: result.email })
 
       if (doesExist)
@@ -65,9 +65,6 @@ module.exports = {
       res.send({ data:savedUser, message: "User data saved successfully." })
     } catch (error) {
       console.error(error);
-
-      if (error.isJoi === true)
-        return next(createError.BadRequest('Invalid Username/Password'))
       next(error)
     }
   },

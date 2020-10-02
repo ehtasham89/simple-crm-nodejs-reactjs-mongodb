@@ -1,19 +1,16 @@
 import api from './../lib/services/api';
 import authService from './../lib/services/auth';
 
+export const AUTH_USER = 'AUTH_USER';
 export const AUTH_BOOT_START = 'AUTH_BOOT_START';
 export const AUTH_BOOT_COMPLETE = 'AUTH_BOOT_COMPLETE';
 export const AUTH_REQUEST_SEND = 'AUTH_REQUEST_SEND';
 export const AUTH_REQUEST_SUCCESS = 'AUTH_REQUEST_SUCCESS';
 export const AUTH_REQUEST_FAIL = 'AUTH_REQUEST_FAIL';
 
-export const authBootStart = () => ({
-    type: AUTH_BOOT_START
-})
-
-export const authBootComplete = (token, user = {}) => ({
-    type: AUTH_BOOT_COMPLETE,
-    payload: { token, user, bootcomplete: true }
+export const authUser = (user = {}) => ({
+    type: AUTH_USER,
+    payload: {user}
 })
 
 export const requestSend = () => ({
@@ -34,32 +31,6 @@ export const logout = () => ({
     type: "USER_LOGOUT"
 });
 
-export const bootAuthentication = (callback = e => e) => (dispatch) => {
-    dispatch(authBootStart());
-    
-    return new Promise((resolve, reject) => {
-        authService.loadToken().then((token) => {
-            token && api.getLoggedUser().then(user => {
-                        authService.loadAuthUser();
-                        
-                        dispatch(authBootComplete(token, user));
-
-                        resolve(null)
-                    }).catch(e => {
-                        dispatch(authBootComplete(null));
-                        
-                        authService.removeToken();
-
-                        callback();
-
-                        //reject("Token not found or expired!");
-                    });
-            
-            !token && dispatch(authBootComplete(null));
-        });
-    });
-}
-
 export const authenticate = (credencials) => (dispatch) => {
     dispatch(logout());
     dispatch(requestSend());
@@ -79,20 +50,38 @@ export const authenticate = (credencials) => (dispatch) => {
                     resolve();
                 }).then(() => {
                     api.getLoggedUser().then(user => {
-                        dispatch(authBootComplete(tokenObject.accessToken, user && user.data));
+                        user && dispatch(authUser(user.data));
                     });
                 });
             }
         }).catch((error) => {
-            console.log("error", error);
-            const errorMsg = error && error.response && 
-                            error.response.data && 
-                            error.response.data.error ? error.response.data.error.message:"Server side error.";
-
-            dispatch(requestFail(errorMsg));
-            
-            reject(error);
+            dispatch(requestFail(errorResp(error)));
+            reject(errorResp);
         });
     });
+}
+
+export const createUser = ({confirmPassword, ...rest}) => (dispatch) => {
+    return new Promise((resolve, reject) => {
+        api.registerNewUser(rest).then((user) => {
+            if (user === undefined) {
+                const errorResp = "Sign-Up user faild, Server side error";
+                dispatch(requestFail(errorResp));
+                reject(errorResp);
+            } else {
+                dispatch(requestFail("New user register successfully, please login."));
+                resolve(null);
+            }
+        }).catch((error) => {
+            dispatch(requestFail(errorResp(error)));
+            reject(errorResp);
+        });
+    });
+}
+
+const errorResp = (error) => {
+    return error && error.response && 
+                            error.response.data && 
+                            error.response.data.error ? error.response.data.error.message:"Server side error.";
 }
 

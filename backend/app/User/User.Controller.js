@@ -19,7 +19,7 @@ module.exports = {
   
   list: async (req, res, next) => {
     try {
-      const data = await User.find({})
+      const data = await User.find({role: "staff"})
       if (!data.length)
         throw createError.NotFound(`User list is empty.`)
 
@@ -32,7 +32,7 @@ module.exports = {
 
   create: async (req, res, next) => {
     try {
-      const result = await userSchema.validateAsync({...req.body, type: "staff"})
+      const result = await userSchema.validateAsync({...req.body, role: "staff"})
       const doesExist = await User.findOne({ email: result.email })
 
       if (doesExist)
@@ -46,7 +46,7 @@ module.exports = {
       console.error(error);
 
       if (error.isJoi === true)
-        return next(createError.BadRequest('Invalid Username/Password'))
+        return next(createError.BadRequest('Invalid user data'))
       next(error)
     }
   },

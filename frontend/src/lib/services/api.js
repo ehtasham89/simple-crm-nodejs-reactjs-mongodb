@@ -17,7 +17,8 @@ class Api extends BaseApiClient {
     registerNewUser(data) {
         return this.post(`/auth/register`, data, {
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'default'
             }
         });
     }
