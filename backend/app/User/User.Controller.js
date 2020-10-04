@@ -1,7 +1,6 @@
 const createError = require('http-errors')
 const User = require('./User.model')
 const { userSchema } = require('../helpers/validation_schema')
-const { getPayload } = require('../helpers/jwt_helper')
 
 module.exports = {
   findById: async (req, res, next) => {
@@ -20,7 +19,7 @@ module.exports = {
   
   list: async (req, res, next) => {
     try {
-      const { userId } = req.body;
+      const userId = req.payload.aud;
       const data = await User.find({userId})
 
       if (!data.length)

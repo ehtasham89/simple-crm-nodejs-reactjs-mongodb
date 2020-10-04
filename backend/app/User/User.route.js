@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const UserController = require('./User.Controller')
 
-router.post('/list', UserController.list)
+router.get('/list', UserController.list)
 
 router.get('/:id', UserController.findById)
 

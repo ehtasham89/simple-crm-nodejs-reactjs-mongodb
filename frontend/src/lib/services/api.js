@@ -32,9 +32,8 @@ class Api extends BaseApiClient {
         return this.get(`/user/${id}`);
     }
 
-    getUserList(userId) {
-        console.log("userIduserIduserId", userId);
-        return this.post(`/user/list`, {userId});
+    getUserList() {
+        return this.get(`/user/list`);
     }
 
     updateUser(id, data) {

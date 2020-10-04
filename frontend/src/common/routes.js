@@ -9,6 +9,7 @@ import ProtectedRoute from './protectedRoute';
 import Login from "./../Auth/models/Login";
 import Signup from "./../Auth/models/Signup";
 import UserList from "./../User/models/ListUser";
+import LeadsList from "./../Leads/models/ListLeads";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
             <ProtectedRoute path="/logout" action="logout" component={props => <div>logout...</div>} />
             <ProtectedRoute path="/signup-staff" component={props => <Signup type="staff" />} />
             <ProtectedRoute path="/user-list" component={props => <UserList />} />
+            <ProtectedRoute path="/leads-list" component={props => <LeadsList />} />
 
             <Route path="/">
                 <Login />

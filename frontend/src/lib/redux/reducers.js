@@ -2,11 +2,13 @@ import { combineReducers } from 'redux';
 
 import auth from './../../Auth/reducer';
 import user from './../../User/reducer';
+import leads from './../../Leads/reducer';
 import authService from './../services/auth';
 
 const appReducer = combineReducers({
     auth,
-    user
+    user,
+    leads
 })
   
 const rootReducer = (state, action) => {

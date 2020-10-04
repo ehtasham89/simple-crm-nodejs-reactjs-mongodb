@@ -55,7 +55,7 @@ module.exports = {
   create: async (req, res, next) => {
     try {
       const { type, ...rest } = req.body
-      
+
       const result = await userSchema.validateAsync({...rest, role: type === 'admin' ? "supper_admin":"staff"})
       const doesExist = await User.findOne({ email: result.email })
 

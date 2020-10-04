@@ -5,43 +5,45 @@ import Button from 'react-bootstrap/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, Redirect } from 'react-router-dom';
 
-import { getUserList, deleteUser, setCurrentUser } from "./../actions";
+import { getLeadsList, deleteLeads, setCurrentLeads } from "./../actions";
 
 export default () => {
-    const title = `User List`;
+    const title = `Leads List`;
     const dispatch = useDispatch();
     const [redirect, setRedirect] = useState(false);
-    const authUserState = useSelector(state => state.auth.user);
-    const userState = useSelector(state => state.user);
+    const authleadsState = useSelector(state => state.auth.user);
+    const leadsState = useSelector(state => state.leads);
 
     useEffect(() => {
         // Update the document title using the browser API
         document.title = `Page: ${title}`;
         
-        dispatch(getUserList());
+        dispatch(getLeadsList(authleadsState._id));
     },[]);
 
     return ( redirect ? <Redirect to="/signup-staff" /> :
             <CONTAINER>
-                <h4>Simple CRM - {title} <Link style={{background: '#e6e6e6', float: 'right', fontSize: '18px', color: 'rgba(0,0,0,0.5)'}} to="/signup-staff">[ Add New Staff User ]</Link></h4>
+                <h4>Simple CRM - {title} <Link style={{background: '#e6e6e6', float: 'right', fontSize: '18px', color: 'rgba(0,0,0,0.5)'}} to="/signup-staff">[ Add New Client ]</Link></h4>
                 <Table striped bordered hover>
                     <thead>
                         <tr>
                         <th>#</th>
-                        <th>Name</th>
-                        <th>Email</th>
+                        <th>Client Name</th>
+                        <th>Client Phone</th>
+                        <th>Client Email</th>
                         <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {userState.list && userState.list.map((row, index) => (
+                        {leadsState.list && leadsState.list.map((row, index) => (
                             <tr key={'row_'+index}>
                                 <td>{(index+1)}</td>
                                 <td>{row.name}</td>
+                                <td>{row.phone}</td>
                                 <td>{row.email}</td>
                                 <td width="20%">
-                                    <Button onClick={e => dispatch(setCurrentUser(row, setRedirect))} style={{margin: '0 10px'}}>Edit</Button>
-                                    <Button onClick={e => dispatch(deleteUser(row._id, authUserState._id))}>Delete</Button>
+                                    <Button onClick={e => dispatch(setCurrentLeads(row, setRedirect))} style={{margin: '0 10px'}}>Edit</Button>
+                                    <Button onClick={e => dispatch(deleteLeads(row._id, authleadsState._id))}>Delete</Button>
                                 </td>
                             </tr>
                         ))}

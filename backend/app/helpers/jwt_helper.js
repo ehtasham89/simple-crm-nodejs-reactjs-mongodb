@@ -42,8 +42,8 @@ module.exports = {
           next(createError.InternalServerError())
           return
         }
-        //console.log(type);
-        if (result && type === result) {
+        
+        if (type == result) {
           req.payload = payload
           
           next()
@@ -105,7 +105,7 @@ module.exports = {
   },
   getPayload: (req, next) => {
     if (!req.headers['authorization']) return "";
-    
+
     const authHeader = req.headers['authorization']
     const bearerToken = authHeader.split(' ')
     const token = bearerToken[1]

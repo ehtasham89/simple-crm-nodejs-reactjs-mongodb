@@ -5,7 +5,7 @@ const { leadsSchema, leadsUpdateSchema } = require('../helpers/validation_schema
 module.exports = {
   list: async (req, res, next) => {
     try {
-      const data = await Leads.find({})
+      const data = await Leads.find({userId: req.payload.aud})
       if (!data.length)
         throw createError.NotFound(`Client list is empty.`)
 

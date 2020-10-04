@@ -14,9 +14,9 @@ export const currentUser = (user = {}) => ({
     payload: {current: user}
 })
 
-export const getUserList = (userId) => (dispatch) => {
+export const getUserList = () => (dispatch) => {
     return new Promise((resolve, reject) => {
-        api.getUserList(userId).then(list => {
+        api.getUserList().then(list => {
             list && dispatch(userList(list.data));
         }).catch((error) => {
             dispatch(userList([]));
